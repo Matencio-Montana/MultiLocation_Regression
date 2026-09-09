@@ -25,7 +25,8 @@ $$
 \hat y=\sigma(XW_1X^T)_1^T XVX^T\sigma(XW_2X^T)_1,
 $$
 
-with softmax activation by default. All matrices are rank one:
+where $\sigma$ denotes the softmax activation by default. The code also supports
+`softplus` and `lin` activations. All matrices are rank one:
 $M=u_Mu_M^T$ for $M\in\{W^*,V^*,W_1,V,W_2\}$.
 
 The main parameters are $L=3$, $d=10^4$, $\gamma=0.49$, and
