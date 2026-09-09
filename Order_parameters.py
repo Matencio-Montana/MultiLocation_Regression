@@ -102,34 +102,34 @@ def pop_err(L_below_flat):
     l2= (y_true - torch.einsum('ni,nij,nj->n', act1, B, act2) )**2
     res = torch.mean(g * l2)/torch.mean(g) 
     return res
+if __name__ == "__main__":
+    lbfgs_steps = int(1e3)
+    optimizer = torch.optim.LBFGS(
+        [L_below_flat],
+        lr=1.0,
+        max_iter=20,
+        history_size=100,
+        line_search_fn='strong_wolfe'
+    )
 
-lbfgs_steps = int(1e3)
-optimizer = torch.optim.LBFGS(
-    [L_below_flat],
-    lr=1.0,
-    max_iter=20,
-    history_size=100,
-    line_search_fn='strong_wolfe'
-)
+    for iteration in range(lbfgs_steps):
+        def closure():
+            optimizer.zero_grad()
+            loss = pop_err(L_below_flat)
+            loss.backward()
+            return loss
 
-for iteration in range(lbfgs_steps):
-    def closure():
-        optimizer.zero_grad()
-        loss = pop_err(L_below_flat)
-        loss.backward()
-        return loss
+        optimizer.step(closure)
 
-    optimizer.step(closure)
+        with torch.no_grad():
+            err = pop_err(L_below_flat)
+        print(f"Iteration {iteration}, Optimization error: {err.item()}", flush=True)
 
-    with torch.no_grad():
-        err = pop_err(L_below_flat)
-    print(f"Iteration {iteration}, Optimization error: {err.item()}", flush=True)
+    print(f"Optimization error: {err.item()}", flush=True)
 
-print(f"Optimization error: {err.item()}", flush=True)
-
-L_block_opt = build_L_block_unit_variance(L_below_flat).cpu().detach().numpy()
-Q_opt = L_block_opt @ L_block_opt.T
-np.save('L_block_opt.npy', L_block_opt)
-np.save('Q_opt.npy', Q_opt)
-print(f"Optimized Q_opt:\n{Q_opt}", flush=True)
+    L_block_opt = build_L_block_unit_variance(L_below_flat).cpu().detach().numpy()
+    Q_opt = L_block_opt @ L_block_opt.T
+    np.save('L_block_opt.npy', L_block_opt)
+    np.save('Q_opt.npy', Q_opt)
+    print(f"Optimized Q_opt:\n{Q_opt}", flush=True)
 

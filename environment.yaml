@@ -1,0 +1,14 @@
+name: MLR_conda_env
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11.7
+  - numpy=2.3.1
+  - scipy=1.16.0
+  - scikit-learn=1.9.0
+  - matplotlib=3.11.0
+  - pip
+  - pip:
+      - torch==2.7.0
