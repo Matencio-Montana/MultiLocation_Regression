@@ -7,34 +7,44 @@ Simulation code for studying a multi-location attention model and its high-dimen
 The data matrix is $X \in \mathbb{R}^{L \times d}$, with target
 
 $$
-y = \frac{1}{d}(X_{\epsilon_1^*})^T V^* X_{\epsilon_2^*}.
+y = \frac{1}{d}(X_{\epsilon_{1}^{*}})^{T} V^{*} X_{\epsilon_{2}^{*}}.
 $$
 
-The input distribution is tilted according to
+The reference distribution $P_0(X)$ is an isotropic Gaussian distribution:
+the entries of $X$ are independent standard Gaussian variables. The input
+distribution is then tilted according to
 
 $$
-P(X\mid\epsilon_1^*,\epsilon_2^*) \propto
-g(\epsilon_1^*,\epsilon_2^*,\chi^*)P_0(X),
+P(X\mid\epsilon_{1}^{*},\epsilon_{2}^{*}) \propto
+g(\epsilon_{1}^{*},\epsilon_{2}^{*},\chi^{*})P_0(X),
 \qquad
-g=\exp\left(\gamma\chi^*_{\epsilon_1^*,\epsilon_2^*}\right),
+g=\exp\left(\gamma\chi^{*}_{\epsilon_{1}^{*},\epsilon_{2}^{*}}\right),
 $$
 
-where $\chi^* = XW^*X^T/\sqrt{d}$. The model prediction is
+where $\chi^{*} = XW^{*}X^{T}/\sqrt{d}$. The model prediction is
 
 $$
-\hat y=\sigma(XW_1X^T)_1^T XVX^T\sigma(XW_2X^T)_1,
+\hat{y}=\sigma(XW_{1}X^{T})_{1}^{T} XVX^{T}\sigma(XW_{2}X^{T})_{1},
 $$
 
 where $\sigma$ denotes the softmax activation by default. The code also supports
-`softplus` and `lin` activations. All matrices are rank one:
-$M=u_Mu_M^T$ for $M\in\{W^*,V^*,W_1,V,W_2\}$.
+`softplus` and `lin` activations. All matrices are symmetric rank-one
+matrices:
+
+$$
+M=u_{M}u_{M}^{T},
+\qquad
+M\in\{W^{*},V^{*},W_{1},V,W_{2}\}.
+$$
+
+Thus, $M^{T}=M$ and $\operatorname{rank}(M)=1$.
 
 The main parameters are $L=3$, $d=10^4$, $\gamma=0.49$, and
-$\epsilon_1^*=0$, $\epsilon_2^*=1$.
+$\epsilon_{1}^{*}=0$, $\epsilon_{2}^{*}=1$.
 
 ## Files
 
-- `Order_parameters.py`: optimizes the asymptotic loss by Monte Carlo integration and L-BFGS. It saves `L_block_opt.npy` and `Q_opt.npy`, where $Q_{MN}=u_M^Tu_N/d$.
+- `Order_parameters.py`: optimizes the asymptotic loss by Monte Carlo integration and L-BFGS. It saves `L_block_opt.npy` and `Q_opt.npy`, where $Q_{MN}=u_{M}^{T}u_{N}/d$.
 - `sgd_rank1.py`: trains the finite-dimensional rank-one model with online SGD and fresh tilted samples at every epoch.
 - `environment.yaml`: Conda environment specification.
 
